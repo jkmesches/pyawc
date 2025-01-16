@@ -3,14 +3,15 @@
 import json
 import re
 import requests
-import const
+from . import const
+from types import NoneType
 
 def is_valid_icao(icao_code: list) -> bool:
     """ Validates the given ICAO IDs. """
     if len(icao_code) != 4:
         print(f"ICAO ID must be 4 characters long. {icao_code} is invalid.")
         return False
-    if icao_code[0].upper() != "K":
+    if icao_code[0].upper() not in ["K", "P"]:
         print(f"ICAO ID must start with K. {icao_code} is invalid.")
         return False
     pattern = r"[^a-zA-Z0-9]" #Define valid characters for ICAO IDs and comma separator
@@ -56,9 +57,9 @@ def fetch_forecast_discussion(cwa: str, aviation_only: bool = False) -> str:
     try:
         response = requests.get(url)
         response.raise_for_status()
-        if response.text != const.NO_AFD_DATA_STR:
-            return response.text
-        return None
+        if response.text == const.NO_AFD_DATA_STR:
+            return None
+        return response.text
     except requests.RequestException as e:
         print(f"Error fetching Forecast Discussion Data: {e}")
         return None
@@ -81,7 +82,6 @@ def fetch_metar(airport_list: list) -> dict:
 
 def fetch_taf(airport_list: list) -> dict:
     """ Fetches the TAF data for the given ICAO ID. """
-
     icao_ids = icao_str_from_list(airport_list)
     url = f"{const.API_BASE_URL}taf?ids={icao_ids}&format=json"
 
@@ -106,9 +106,24 @@ def save_json(data: dict, filename: str) -> None:
 
 def save_text(data: str, filename: str) -> None:
     """ Saves the given data to a text file. """
+    if type(data) != str:
+        if type(data) == NoneType:
+            print("No data to save.")
+            return
+        else:
+            print(f"Data must be a string. {type(data)} is invalid.")
+    
     try:
         with open(filename, 'w', encoding='utf-8') as text_file:
             text_file.write(data)
-    except IOError as e:
+    except Exception as e:
         print(f"Error saving data to file: {e}")
+
+if __name__ == "__main__":
+    airports = ["KJFK", "KORD", "KATL"]
+    metar_data = fetch_metar(airports)
+    taf_data = fetch_taf(airports)
+    save_json(metar_data, "metar.json")
+    save_json(taf_data, "taf.json")
+
 #EOF

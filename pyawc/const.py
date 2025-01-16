@@ -2,9 +2,7 @@
 Constants used in the pyawc package.
 """
 
-#from enum import unique
 import os
-#import sys
 from typing import Final
 
 file_dir = os.path.join(os.path.dirname(__file__), "..")
