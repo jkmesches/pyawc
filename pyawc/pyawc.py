@@ -42,10 +42,11 @@ def icao_str_from_list(icao_list: list) -> str:
     icao_str = ",".join(icao_list)
     return icao_str.upper()
 
-def fetch_forecast_discussion(cwa: str, aviation_only: bool = False) -> str:
+def fetch_forecast_discussion(cwa: str, aviation_only: bool = False, bypass_cwa_verification: bool = False) -> str:
     """ Fetches the forecast discussion for the given ICAO ID. """
-    if not is_valid_cwa(cwa):
-        return None
+    if not bypass_cwa_verification:
+        if not is_valid_cwa(cwa):
+            return None
 
     if aviation_only:
         discussion_type = "afd"
@@ -53,6 +54,7 @@ def fetch_forecast_discussion(cwa: str, aviation_only: bool = False) -> str:
         discussion_type = "af"
 
     url = f"{const.API_BASE_URL}fcstdisc?cwa={cwa}&type={discussion_type}"
+    print(url)
 
     try:
         response = requests.get(url)
