@@ -1,8 +1,9 @@
 """Example script to demonstrate the usage of the pyawc library."""
 
-from pyawc import fetch_metar, fetch_taf, save_text, save_json, fetch_forecast_discussion
+from pyawc import *
 from tqdm import tqdm
 from time import sleep
+from os import path
 
 def FetchAllDiscussions(stations):
     """ Fetches forecast discussions for all stations in the given list. """
@@ -28,10 +29,10 @@ def FetchAllDiscussions(stations):
 
 def main():
     """ Main function to demonstrate the usage of the pyawc library. """
-    with open("us_airport_codes.txt") as f:
+    with open(path.join("utils","us_airport_codes.txt")) as f:
         airport_list = f.read().splitlines()
 
-    with open("us_cwas.txt") as f:
+    with open(path.join("utils","us_cwas.txt")) as f:
         cwa_list = f.read().splitlines()
     #save_json(fetch_metar(airport_list), "metars.json")
     #save_json(fetch_taf(airport_list), "tafs.json")
